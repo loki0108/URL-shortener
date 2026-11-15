@@ -44,10 +44,10 @@ accessed links in Redis for fast lookups. The whole stack runs with a single
 
 ```mermaid
 flowchart LR
-    U[Client / Browser] -->|HTTP| A[FastAPI app]
-    A -->|1. lookup short code| R[(Redis cache)]
-    A -->|2. on cache miss| P[(PostgreSQL)]
-    A -.->|background task: record click| P
+    U["Client / Browser"] -->|"HTTP"| A["FastAPI app"]
+    A -->|"Step 1: look up short code"| R[("Redis cache")]
+    A -->|"Step 2: on cache miss"| P[("PostgreSQL")]
+    A -.->|"Background task: record click"| P
 ```
 
 ### Redirect flow (cache-aside)
