@@ -1,0 +1,46 @@
+name: CI
+
+# Run on every push to any branch, and on pull requests
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: Tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12", "3.13"]   # test on two Python versions
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: requirements*.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Run tests
+        run: pytest -v
+
+  docker-build:
+    name: Docker image builds
+    runs-on: ubuntu-latest
+    needs: test   # only runs if all tests passed
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t url-shortener:ci .
+
+      - name: Validate docker-compose.yml
+        run: docker compose config --quiet
